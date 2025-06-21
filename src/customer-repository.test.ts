@@ -28,7 +28,7 @@ const setupDatabase = async () => {
   };
 };
 
-test("should create customers", async () => {
+test.concurrent("should create customers", async () => {
   const customer1 = { id: 1, name: "John Doe" };
   const customer2 = { id: 2, name: "Jane Doe" };
 
@@ -40,7 +40,7 @@ test("should create customers", async () => {
   expect(customers).toEqual([customer1, customer2]);
 });
 
-test("should start with 0 customers in the database", async () => {
+test.concurrent("should start with 0 customers in the database", async () => {
   await using postgres = await setupDatabase();
 
   const customers = await getCustomers(postgres.client);

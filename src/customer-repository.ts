@@ -1,9 +1,10 @@
 import type { Client } from "pg";
 
 export const createCustomerTable = async (client: Client) => {
+  // id INT NOT NULL,
   await client.query(`
     CREATE TABLE IF NOT EXISTS customers (
-      id INT NOT NULL,
+      id BIGINT NOT NULL,
       name VARCHAR NOT NULL,
       PRIMARY KEY (id)
     )

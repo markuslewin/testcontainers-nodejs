@@ -2,7 +2,7 @@ import { PrismaClient } from "../generated/prisma";
 
 export const createCustomer = async (
   client: PrismaClient,
-  customer: { id: number; name: string }
+  customer: { id: string; name: string }
 ) => {
   return await client.customer.create({
     data: {

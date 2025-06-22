@@ -1,12 +1,19 @@
 import { test, expect } from "vitest";
-import { PostgreSqlContainer } from "@testcontainers/postgresql";
+import { MSSQLServerContainer } from "@testcontainers/mssqlserver";
 import { createCustomer, getCustomers } from "./customer-repository";
 import { PrismaClient } from "../generated/prisma";
 import { execa } from "execa";
 
 const setUpDatabase = async () => {
-  const container = await new PostgreSqlContainer("postgres").start();
-  const connectionString = container.getConnectionUri();
+  const container = await new MSSQLServerContainer(
+    "mcr.microsoft.com/mssql/server"
+  )
+    .acceptLicense()
+    .start();
+
+  // const connectionString = container.getConnectionUri()
+  // JDBC for Prisma
+  const connectionString = `sqlserver://${container.getHost()}:${container.getPort()};database=${container.getDatabase()};user=${container.getUsername()};password=${container.getPassword()};encrypt=true;trustServerCertificate=true`;
 
   await execa({
     env: {
@@ -29,20 +36,20 @@ const setUpDatabase = async () => {
 };
 
 test.concurrent("should create customers", async () => {
-  const customer1 = { id: 1, name: "John Doe" };
-  const customer2 = { id: 2, name: "Jane Doe" };
+  const customer1 = { id: "1", name: "John Doe" };
+  const customer2 = { id: "2", name: "Jane Doe" };
 
-  await using postgres = await setUpDatabase();
-  await createCustomer(postgres.client, customer1);
-  await createCustomer(postgres.client, customer2);
+  await using mssqlserver = await setUpDatabase();
+  await createCustomer(mssqlserver.client, customer1);
+  await createCustomer(mssqlserver.client, customer2);
 
-  const customers = await getCustomers(postgres.client);
+  const customers = await getCustomers(mssqlserver.client);
   expect(customers).toEqual([customer1, customer2]);
 });
 
 test.concurrent("should start with 0 customers in the database", async () => {
-  await using postgres = await setUpDatabase();
+  await using mssqlserver = await setUpDatabase();
 
-  const customers = await getCustomers(postgres.client);
+  const customers = await getCustomers(mssqlserver.client);
   expect(customers).toEqual([]);
 });

@@ -20,8 +20,8 @@ export const setUpDatabase = async () => {
 
   return {
     connectionString,
-    stop: () => {
-      container.stop();
+    stop: async () => {
+      await container.stop();
     },
   };
 };

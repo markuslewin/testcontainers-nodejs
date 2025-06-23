@@ -1,9 +1,9 @@
-import { PrismaClient } from "../generated/prisma";
+import client from "./client";
 
-export const createCustomer = async (
-  client: PrismaClient,
-  customer: { id: string; name: string }
-) => {
+export const createCustomer = async (customer: {
+  id: string;
+  name: string;
+}) => {
   return await client.customer.create({
     data: {
       id: customer.id,
@@ -15,7 +15,7 @@ export const createCustomer = async (
   });
 };
 
-export const getCustomers = async (client: PrismaClient) => {
+export const getCustomers = async () => {
   return await client.customer.findMany({
     select: {
       id: true,

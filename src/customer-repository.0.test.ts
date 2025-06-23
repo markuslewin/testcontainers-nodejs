@@ -1,7 +1,7 @@
 import { test, expect } from "vitest";
 import { createCustomer, getCustomers } from "./customer-repository";
 
-test.only("should create customers", async () => {
+test("should create customers", async () => {
   const customer1 = { id: "1", name: "John Doe" };
   const customer2 = { id: "2", name: "Jane Doe" };
 

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - singleton-client
 
 jobs:
   test:

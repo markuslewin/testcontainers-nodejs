@@ -1,19 +1,12 @@
 import { test, expect } from "vitest";
-import { MSSQLServerContainer } from "@testcontainers/mssqlserver";
 import { createCustomer, getCustomers } from "./customer-repository";
 import { PrismaClient } from "../generated/prisma";
 import { execa } from "execa";
+import { msSqlServerContainerInject } from "../tests/setup/global-setup";
 
-const setUpDatabase = async () => {
-  const container = await new MSSQLServerContainer(
-    "mcr.microsoft.com/mssql/server"
-  )
-    .acceptLicense()
-    .start();
-
-  // const connectionString = container.getConnectionUri()
-  // JDBC for Prisma
-  const connectionString = `sqlserver://${container.getHost()}:${container.getPort()};database=${container.getDatabase()};user=${container.getUsername()};password=${container.getPassword()};encrypt=true;trustServerCertificate=true`;
+const setUpDatabase = async ({ database }: { database: string }) => {
+  const container = msSqlServerContainerInject();
+  const connectionString = `sqlserver://${container.host}:${container.port};database=${database};user=${container.username};password=${container.password};encrypt=true;trustServerCertificate=true`;
 
   await execa({
     env: {
@@ -30,26 +23,28 @@ const setUpDatabase = async () => {
     client,
     [Symbol.asyncDispose]: async () => {
       await client.$disconnect();
-      await container.stop();
     },
   };
 };
 
-test.concurrent("should create customers", async () => {
+test.concurrent("should create customers", async ({ task }) => {
   const customer1 = { id: "1", name: "John Doe" };
   const customer2 = { id: "2", name: "Jane Doe" };
 
-  await using mssqlserver = await setUpDatabase();
-  await createCustomer(mssqlserver.client, customer1);
-  await createCustomer(mssqlserver.client, customer2);
+  await using msSqlServer = await setUpDatabase({ database: task.id });
+  await createCustomer(msSqlServer.client, customer1);
+  await createCustomer(msSqlServer.client, customer2);
 
-  const customers = await getCustomers(mssqlserver.client);
+  const customers = await getCustomers(msSqlServer.client);
   expect(customers).toEqual([customer1, customer2]);
 });
 
-test.concurrent("should start with 0 customers in the database", async () => {
-  await using mssqlserver = await setUpDatabase();
+test.concurrent(
+  "should start with 0 customers in the database",
+  async ({ task }) => {
+    await using msSqlServer = await setUpDatabase({ database: task.id });
 
-  const customers = await getCustomers(mssqlserver.client);
-  expect(customers).toEqual([]);
-});
+    const customers = await getCustomers(msSqlServer.client);
+    expect(customers).toEqual([]);
+  }
+);

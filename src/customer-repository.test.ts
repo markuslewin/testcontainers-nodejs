@@ -2,7 +2,7 @@ import { test, expect } from "vitest";
 import { createCustomer, getCustomers } from "./customer-repository";
 import { PrismaClient } from "../generated/prisma";
 import { execa } from "execa";
-import { msSqlServerContainerInject } from "../tests/setup/global-setup";
+import { msSqlServerContainerInject } from "../tests/setup/ms-sql-server-container";
 
 const setUpDatabase = async ({ database }: { database: string }) => {
   const container = msSqlServerContainerInject();

@@ -2,7 +2,6 @@ import {
   MSSQLServerContainer,
   StartedMSSQLServerContainer,
 } from "@testcontainers/mssqlserver";
-import { inject } from "vitest";
 import { TestProject } from "vitest/node";
 
 let container: StartedMSSQLServerContainer | undefined;
@@ -22,12 +21,4 @@ export const setup = async (project: TestProject) => {
 
 export const teardown = () => {
   container?.stop();
-};
-
-export const msSqlServerContainerInject = () => {
-  const container = inject("MSSQLServerContainer");
-  if (!container) {
-    throw new Error("Container not found");
-  }
-  return container;
 };

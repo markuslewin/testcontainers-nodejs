@@ -1,10 +1,10 @@
-import client from "./client";
+import { prisma } from "./prisma";
 
 export const createCustomer = async (customer: {
   id: string;
   name: string;
 }) => {
-  return await client.customer.create({
+  return await prisma.customer.create({
     data: {
       id: customer.id,
       name: customer.name,
@@ -16,7 +16,7 @@ export const createCustomer = async (customer: {
 };
 
 export const getCustomers = async () => {
-  return await client.customer.findMany({
+  return await prisma.customer.findMany({
     select: {
       id: true,
       name: true,
